@@ -29,8 +29,11 @@ const Appbar = () => {
   };
 
   const navigation = [
-    { name: "Projects", href: "/account/projects", current: false },
-    { name: "Members", href: "/account/members", current: false },
+    { name: "Habitaciones", href: "/account/projects", current: false },
+    { name: "Huéspedes", href: "/account/members", current: false },
+    { name: "Reservaciones", href: "/account/members", current: false },
+    { name: "Caja", href: "/account/members", current: false },
+    { name: "Transaciones", href: "/account/members", current: false },
   ];
 
   return (

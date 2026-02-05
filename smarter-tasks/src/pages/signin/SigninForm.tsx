@@ -18,21 +18,21 @@ const SigninForm: React.FC = () => {
     const { email, password } = data;
 
     try {
-      const response = await fetch(`${API_ENDPOINT}/users/sign_in`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      // const response = await fetch(`${API_ENDPOINT}/users/sign_in`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({ email, password }),
+      // });
 
-      if (!response.ok) {
-        throw new Error("Sign-in failed");
-      }
+      // if (!response.ok) {
+      //   throw new Error("Sign-in failed");
+      // }
 
-      console.log("Sign-in successful");
-      const data = await response.json();
+      // console.log("Sign-in successful");
+      // const data = await response.json();
 
-      localStorage.setItem("authToken", data.token);
-      localStorage.setItem("userData", JSON.stringify(data.user));
+      localStorage.setItem("authToken", "data.token");
+      localStorage.setItem("userData", "JSON.stringify(data.user)");
       navigate("/account");
     } catch (error) {
       console.error("Sign-in failed:", error);
