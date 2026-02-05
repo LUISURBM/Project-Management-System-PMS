@@ -7,6 +7,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import AccountLayout from "../layouts/account";
 import ProtectedRoute from "./ProtectedRoute";
+import Habitacion from "../pages/habitaciones";
 
 const Signin = React.lazy(() => import("../pages/signin"));
 const Signup = React.lazy(() => import("../pages/signup"));
@@ -79,6 +80,10 @@ const router = createBrowserRouter([
       {
         path: "members",
         element: <Members />,
+      },
+      {
+        path: "habitaciones",
+        element: <Habitacion />,
       },
     ],
   },
