@@ -8,6 +8,10 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import AccountLayout from "../layouts/account";
 import ProtectedRoute from "./ProtectedRoute";
 import Habitacion from "../pages/habitaciones";
+import Huesped from "../pages/huespedes";
+import Reservas from "../pages/reservas";
+import Caja from "../pages/caja";
+import Transacciones from "../pages/transacciones";
 
 const Signin = React.lazy(() => import("../pages/signin"));
 const Signup = React.lazy(() => import("../pages/signup"));
@@ -84,6 +88,22 @@ const router = createBrowserRouter([
       {
         path: "habitaciones",
         element: <Habitacion />,
+      },
+      {
+        path: "huespedes",
+        element: <Huesped />,
+      },
+      {
+        path: "reservaciones",
+        element: <Reservas />,
+      },
+      {
+        path: "cajas",
+        element: <Caja />,
+      },
+      {
+        path: "transacciones",
+        element: <Transacciones />,
       },
     ],
   },
