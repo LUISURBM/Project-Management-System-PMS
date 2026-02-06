@@ -32,7 +32,7 @@ const Appbar = () => {
     { name: "Habitaciones", href: "/account/habitaciones", current: false },
     { name: "Huéspedes", href: "/account/huespedes", current: false },
     { name: "Reservaciones", href: "/account/reservaciones", current: false },
-    { name: "Caja", href: "/account/caja", current: false },
+    { name: "Caja", href: "/account/cajas", current: false },
     { name: "Transaciones", href: "/account/transacciones", current: false },
     { name: "Usuarios", href: "/account/members", current: false },
   ];
