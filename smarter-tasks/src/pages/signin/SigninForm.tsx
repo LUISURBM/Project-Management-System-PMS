@@ -1,7 +1,6 @@
 import React from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { API_ENDPOINT } from "../../config/constants";
 
 const SigninForm: React.FC = () => {
   const navigate = useNavigate();
@@ -14,8 +13,8 @@ const SigninForm: React.FC = () => {
     email: string;
     password: string;
   };
-  const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const { email, password } = data;
+  const onSubmit: SubmitHandler<Inputs> = async () => {
+    // const { email, password } = data;
 
     try {
       // const response = await fetch(`${API_ENDPOINT}/users/sign_in`, {
