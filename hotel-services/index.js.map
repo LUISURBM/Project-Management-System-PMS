@@ -1,0 +1,116 @@
+{
+	"routes": [
+		{
+			"method": "API",
+			"url": "/api/",
+			"id": "Habitacion|list",
+			"name": "List all habitaciones"
+		},
+		{
+			"method": "API",
+			"url": "/api/",
+			"id": "Habitacion|read",
+			"input": "*id_habitacion:Number",
+			"name": "Get a specific habitacion"
+		},
+		{
+			"method": "API",
+			"url": "/api/",
+			"id": "Habitacion|create",
+			"input": "*numero:String, *tipo:String, *precio_base:Decimal, id_estado:Number, notas_extras:String",
+			"name": "Create new habitacion"
+		},
+		{
+			"method": "API",
+			"url": "/api/",
+			"id": "Habitacion|update",
+			"input": "*id_habitacion:Number, numero:String, tipo:String, precio_base:Decimal, id_estado:Number, notas_extras:String",
+			"name": "Update habitacion"
+		},
+		{
+			"method": "API",
+			"url": "/api/",
+			"id": "Habitacion|remove",
+			"input": "*id_habitacion:Number",
+			"name": "Delete habitacion"
+		},
+		{
+			"method": "GET",
+			"url": "/api/rooms"
+		},
+		{
+			"method": "GET",
+			"url": "/api/rooms/{id}",
+			"params": "id:string"
+		},
+		{
+			"method": "POST",
+			"url": "/api/rooms"
+		},
+		{
+			"method": "PUT",
+			"url": "/api/rooms/{id}",
+			"params": "id:string"
+		},
+		{
+			"method": "DELETE",
+			"url": "/api/rooms/{id}",
+			"params": "id:string"
+		},
+		{
+			"method": "GET",
+			"url": "/db-status"
+		}
+	],
+	"actions": [
+		{
+			"name": "Habitacion|list"
+		},
+		{
+			"name": "Habitacion|read",
+			"input": "*id_habitacion:Number"
+		},
+		{
+			"name": "Habitacion|create",
+			"input": "*numero:String, *tipo:String, *precio_base:Decimal, id_estado:Number, notas_extras:String"
+		},
+		{
+			"name": "Habitacion|update",
+			"input": "*id_habitacion:Number, numero:String, tipo:String, precio_base:Decimal, id_estado:Number, notas_extras:String"
+		},
+		{
+			"name": "Habitacion|remove",
+			"input": "*id_habitacion:Number"
+		},
+		{
+			"name": "Rooms|list"
+		},
+		{
+			"name": "Rooms|get",
+			"input": "*id:Number"
+		},
+		{
+			"name": "Rooms|create",
+			"input": "*numero:String, *tipo:String, *precio_base:Decimal, id_estado:Number, notas_extras:String"
+		},
+		{
+			"name": "Rooms|update",
+			"input": "*id:Number, numero:String, tipo:String, precio_base:Decimal, id_estado:Number, notas_extras:String"
+		},
+		{
+			"name": "Rooms|remove",
+			"input": "*id:Number"
+		},
+		{
+			"name": "Cajas/abrir",
+			"input": "*monto_inicial:Number"
+		},
+		{
+			"name": "Cajas/movimiento",
+			"input": "*id_caja:Number, *monto:Number, *tipo_movimiento:String, descripcion:String"
+		},
+		{
+			"name": "Rooms/list"
+		}
+	]
+}

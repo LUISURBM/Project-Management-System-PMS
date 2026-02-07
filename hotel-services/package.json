@@ -1,0 +1,20 @@
+{
+  "name": "hotel-services",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js --debug",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dbms": "^1.0.9",
+    "mysql2": "^3.16.3",
+    "pg": "^8.18.0",
+    "querybuildermysql2": "^1.0.8",
+    "total5": "^0.0.15"
+  }
+}

@@ -1,0 +1,6 @@
+// config
+db_sql      : mysqldb
+database    : mysql://app_user:strong_password@localhost:3306/hotel_db?pooling=false
+flow        : 1
+flowui      : 1
+flowip      : '*'
