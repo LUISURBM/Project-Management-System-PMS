@@ -1,1 +1,1 @@
-database : env(DATABASE_URL)
+database : env(MySQL.MYSQL_URL)
