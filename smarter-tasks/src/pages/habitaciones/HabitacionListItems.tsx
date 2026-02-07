@@ -1,12 +1,12 @@
 import { Link } from "react-router-dom";
-import { useProjectsState } from "../../context/projects/context";
+import { useHabitacionesState } from "../../context/habitaciones/context";
 
 export default function HabitacionListItems() {
-  let state: any = useProjectsState();
-  const { projects, isLoading, isError, errorMessage } = state;
-  console.log(projects);
+  let state: any = useHabitacionesState();
+  console.log(state);
+  const { habitaciones, isLoading, isError, errorMessage } = state;
 
-  if (projects.length === 0 && isLoading) {
+  if (habitaciones.length === 0 && isLoading) {
     return <span>Loading...</span>;
   }
 
@@ -16,7 +16,7 @@ export default function HabitacionListItems() {
 
   return (
     <>
-      {projects.map((project: any) => (
+      {habitaciones.map((project: any) => (
         <Link
           key={project.id}
           to={`${project.id}`}
