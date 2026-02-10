@@ -8,10 +8,11 @@ require('total5');
 
 const options = {};
 // options.release = process.env.RAILWAY_ENVIRONMENT_NAME === 'production' || process.argv.includes('--release');
-
-const isProduction = process.env.RAILWAY_ENVIRONMENT_NAME === 'production';
-
-NEWCONF(isProduction ? 'release' : 'default');
+// Detectar Railway production
+const isProduction =
+    process.env.RAILWAY_ENVIRONMENT_NAME === 'production';
+// Cargar configuración
+CONF.load(isProduction ? 'release' : 'default');
 
 // options.ip = '127.0.0.1';
 // options.port = parseInt(process.argv[2]);
