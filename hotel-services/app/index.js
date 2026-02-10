@@ -7,6 +7,10 @@ require('total5');
 // Total.http({ load: 'none' });
 
 const options = {};
+
+options.cluster = 5; // opens 5 threads
+options.cluster = 'auto';
+options.release = true;
 // options.release = process.env.RAILWAY_ENVIRONMENT_NAME === 'production' || process.argv.includes('--release');
 // Detectar Railway production
 
