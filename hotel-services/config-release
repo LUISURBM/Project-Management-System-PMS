@@ -1,1 +1,1 @@
-database (env) : DATABASE_CONNECTION
+database (env) : MYSQL_URL
