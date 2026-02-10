@@ -6,8 +6,10 @@ const options = {};
 if (process.env.DATABASE_CONNECTION) {
     process.env.database = process.env.DATABASE_CONNECTION;
 }
+global.CONF = global.CONF || {};
+CONF.database = process.env.MYSQL_URL || process.env.DATABASE_CONNECTION;
 options.release = true;
-options.directory = __dirname + '/../';
+// options.directory = __dirname + '/../';
 options.config = {
     database: process.env.DATABASE_CONNECTION || process.env.MYSQL_URL
 };
