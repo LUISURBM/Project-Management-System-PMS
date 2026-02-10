@@ -15,7 +15,7 @@
 // // Optional: Just use ready for a success message
 // ON('ready', () => console.log('---> Framework is ready, DB should be active.'));
 
-/definitions/database.js
+// /definitions/database.js
 
 // We wrap this in a function or check to ensure we get the LATEST CONF.database which was injected by index.js
 ON('boot', function() {
