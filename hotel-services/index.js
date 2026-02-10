@@ -3,7 +3,10 @@
 require('total5');
 
 const options = {};
-
+options.release = true;
+options.config = {
+    database: process.env.DATABASE_CONNECTION || process.env.MYSQL_URL
+};
 Total.run(options);
 setTimeout(() => console.log('DEBUG -> process.env.DATABASE_CONNECTION', process.env.DATABASE_CONNECTION), 2000);
 setTimeout(() => console.log('DEBUG -> process.env.NODE_ENV', process.env.NODE_ENV), 2000);
