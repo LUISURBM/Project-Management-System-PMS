@@ -7,11 +7,12 @@ if (process.env.DATABASE_CONNECTION) {
     process.env.database = process.env.DATABASE_CONNECTION;
 }
 global.CONF = global.CONF || {};
-CONF.database = process.env.MYSQL_URL || process.env.DATABASE_CONNECTION;
+CONF.database = process.env.DATABASE_CONNECTION;
 options.release = true;
 // options.directory = __dirname + '/../';
 options.config = {
-    database: process.env.DATABASE_CONNECTION || process.env.MYSQL_URL
+    database: process.env.DATABASE_CONNECTION
 };
 Total.run(options);
-console.log('INIT ==> CONF.database', CONF.database);
+setTimeout(() => console.log('CONF after Total.run:', CONF), 2000); // Debugging line to check CONF after initialization
+setTimeout(() => console.log('INIT ==> CONF.database', CONF.database), 2000);
