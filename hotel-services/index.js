@@ -8,6 +8,7 @@ options.config = {
     database: process.env.DATABASE_CONNECTION || process.env.MYSQL_URL
 };
 Total.run(options);
+setTimeout(() => console.log('DEBUG -> process.env.MYSQL_URL', process.env.MYSQL_URL), 2000);
 setTimeout(() => console.log('DEBUG -> process.env.DATABASE_CONNECTION', process.env.DATABASE_CONNECTION), 2000);
 setTimeout(() => console.log('DEBUG -> process.env.NODE_ENV', process.env.NODE_ENV), 2000);
 setTimeout(() => console.log('DEBUG -> process.env.RAILWAY_ENVIRONMENT_NAME', process.env.RAILWAY_ENVIRONMENT_NAME), 2000);
