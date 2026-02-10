@@ -7,6 +7,7 @@ require('total5');
 // Total.http({ load: 'none' });
 
 const options = {};
+options.release = process.env.RAILWAY_ENVIRONMENT_NAME === 'production' || process.argv.includes('--release');
 
 // options.ip = '127.0.0.1';
 // options.port = parseInt(process.argv[2]);
@@ -20,7 +21,7 @@ const options = {};
 // options.watcher = false; // disables watcher
 // options.edit = 'wss://www.yourcodeinstance.com/?id=projectname'
 
-options.release = process.argv.includes('--release');
+// options.release = process.argv.includes('--release');
 
 // Service mode:
 options.servicemode = process.argv.includes('--service') || process.argv.includes('--servicemode');
