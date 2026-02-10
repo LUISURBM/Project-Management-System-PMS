@@ -7,7 +7,11 @@ require('total5');
 // Total.http({ load: 'none' });
 
 const options = {};
-options.release = process.env.RAILWAY_ENVIRONMENT_NAME === 'production' || process.argv.includes('--release');
+// options.release = process.env.RAILWAY_ENVIRONMENT_NAME === 'production' || process.argv.includes('--release');
+
+const isProduction = process.env.RAILWAY_ENVIRONMENT_NAME === 'production';
+
+NEWCONF(isProduction ? 'release' : 'default');
 
 // options.ip = '127.0.0.1';
 // options.port = parseInt(process.argv[2]);
