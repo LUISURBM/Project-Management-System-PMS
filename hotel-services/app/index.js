@@ -9,10 +9,6 @@ require('total5');
 const options = {};
 // options.release = process.env.RAILWAY_ENVIRONMENT_NAME === 'production' || process.argv.includes('--release');
 // Detectar Railway production
-const isProduction =
-    process.env.RAILWAY_ENVIRONMENT_NAME === 'production';
-// Cargar configuración
-CONF.load(isProduction ? 'release' : 'default');
 
 // options.ip = '127.0.0.1';
 // options.port = parseInt(process.argv[2]);
@@ -39,6 +35,7 @@ CONF.load(isProduction ? 'release' : 'default');
 
 
 Total.run(options);
+setTimeout(() => console.log('DEBUG -> process.env.NODE_ENV', process.env.NODE_ENV), 2000);
 setTimeout(() => console.log('DEBUG -> process.env.RAILWAY_ENVIRONMENT_NAME', process.env.RAILWAY_ENVIRONMENT_NAME), 2000);
 setTimeout(() => console.log('DEBUG -> Mode:', CONF.release ? 'RELEASE' : 'DEBUG'), 2000);
 setTimeout(() => console.log('INIT ==> Current Database Config:', CONF.database), 2000);
