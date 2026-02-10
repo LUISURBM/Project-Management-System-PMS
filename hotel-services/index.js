@@ -4,6 +4,7 @@ require('total5');
 
 const options = {};
 options.release = true;
+options.directory = __dirname + '/../';
 options.config = {
     database: process.env.DATABASE_CONNECTION || process.env.MYSQL_URL
 };
