@@ -1,38 +1,34 @@
-// /definitions/database.js
+// // /definitions/database.js
 
-// 1. Check if config exists immediately
-if (CONF.database) {
+// // 1. Check if config exists immediately
+// if (CONF.database) {
     
-    // 2. Initialize IMMEDIATELY (outside any ON('ready') block)
-    // This allows the DBMS to register the driver while the framework is booting
-    require('querybuildermysql2').init('default', CONF.database);
+//     // 2. Initialize IMMEDIATELY (outside any ON('ready') block)
+//     // This allows the DBMS to register the driver while the framework is booting
+//     require('querybuildermysql2').init('default', CONF.database);
 
-    console.log('---> DBMS: Initializing with ' + CONF.database.split('@')[1]); // Logs host only for safety
-} else {
-    console.error('---> DBMS: "database" connection string is missing in config!');
-}
+//     console.log('---> DBMS: Initializing with ' + CONF.database.split('@')[1]); // Logs host only for safety
+// } else {
+//     console.error('---> DBMS: "database" connection string is missing in config!');
+// }
 
-// Optional: Just use ready for a success message
-ON('ready', () => console.log('---> Framework is ready, DB should be active.'));
+// // Optional: Just use ready for a success message
+// ON('ready', () => console.log('---> Framework is ready, DB should be active.'));
 
 // /definitions/database.js
 
-// Priority 1: Use the Variable from index.js (CONF.database)
-// Priority 2: Use the Direct Railway Env Var
-// /definitions/database.js
+// We wrap this in a function or check to ensure we get the LATEST CONF.database
+// which was injected by index.js
+ON('boot', function() {
+    const conn = CONF.database || process.env.MYSQL_URL;
 
-// ON('ready', function() {
-    
-//     // Total.js v5 uses 'dbms' as the primary database wrapper
-//     const conn = CONF.database;
-
-//     if (conn) {
-//         // This line is what actually "Initializes" the database
-//         require('dbms').init(conn, ERROR('DBMS'));
+    if (conn) {
+        // V5 uses 'dbms' to bridge QueryBuilder and the Total.js core
+        require('dbms').init(conn, ERROR('DBMS'));
         
-//         // Log to verify it's not localhost anymore
-//         console.log('---> DBMS: Initialized with host:', conn.split('@')[1]);
-//     } else {
-//         console.error('---> DBMS: ERROR! No connection string found in CONF.database');
-//     }
-// });
+        const host = conn.split('@')[1] || 'URL present';
+        console.log('---> DBMS: Initialized with host:', host);
+    } else {
+        console.error('---> DBMS: CRITICAL ERROR - No connection string found!');
+    }
+});
