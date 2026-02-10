@@ -18,15 +18,20 @@
 
 // Priority 1: Use the Variable from index.js (CONF.database)
 // Priority 2: Use the Direct Railway Env Var
-const connectionString = CONF.database || process.env.MYSQL_URL || process.env.DATABASE_CONNECTION;
+// /definitions/database.js
 
-if (connectionString) {
-    // We use the dbms module which handles the mysql2 driver internally
-    require('dbms').init(connectionString, ERROR('DBMS'));
+ON('ready', function() {
     
-    // Log the sanitized host so you can see it's NOT localhost
-    const host = connectionString.split('@')[1] || connectionString;
-    console.log('---> DBMS: Initializing with ' + host);
-} else {
-    console.error('---> DBMS: ERROR - No connection string found!');
-}
+    // Total.js v5 uses 'dbms' as the primary database wrapper
+    const conn = CONF.database;
+
+    if (conn) {
+        // This line is what actually "Initializes" the database
+        require('dbms').init(conn, ERROR('DBMS'));
+        
+        // Log to verify it's not localhost anymore
+        console.log('---> DBMS: Initialized with host:', conn.split('@')[1]);
+    } else {
+        console.error('---> DBMS: ERROR! No connection string found in CONF.database');
+    }
+});
