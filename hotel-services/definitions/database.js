@@ -20,7 +20,7 @@
 // We wrap this in a function or check to ensure we get the LATEST CONF.database
 // which was injected by index.js
 ON('boot', function() {
-    const conn = CONF.database || process.env.MYSQL_URL;
+    const conn = CONF.database || process.env.DATABASE_CONNECTION;
 
     if (conn) {
         // V5 uses 'dbms' to bridge QueryBuilder and the Total.js core
