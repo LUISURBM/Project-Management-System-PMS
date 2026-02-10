@@ -38,6 +38,7 @@ options.release = true;
 // options.limit = 10; // max 10. threads (works only with "auto" scaling)
 
 Total.run(options);
+setTimeout(() => console.log('DEBUG -> process.env.DATABASE_CONNECTION', process.env.DATABASE_CONNECTION), 2000);
 setTimeout(() => console.log('DEBUG -> process.env.NODE_ENV', process.env.NODE_ENV), 2000);
 setTimeout(() => console.log('DEBUG -> process.env.RAILWAY_ENVIRONMENT_NAME', process.env.RAILWAY_ENVIRONMENT_NAME), 2000);
 setTimeout(() => console.log('DEBUG -> Mode:', CONF.release ? 'RELEASE' : 'DEBUG'), 2000);
