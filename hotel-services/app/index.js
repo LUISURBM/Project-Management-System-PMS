@@ -33,5 +33,5 @@ options.servicemode = process.argv.includes('--service') || process.argv.include
 
 
 Total.run(options);
-
+setTimeout(() => console.log('DEBUG -> Mode:', CONF.release ? 'RELEASE' : 'DEBUG'), 2000);
 setTimeout(() => console.log('INIT ==> Current Database Config:', CONF.database), 2000);
