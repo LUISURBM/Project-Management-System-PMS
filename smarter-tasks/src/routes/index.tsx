@@ -12,12 +12,14 @@ import Huesped from "../pages/huespedes";
 import Reservas from "../pages/reservas";
 import Caja from "../pages/caja";
 import Transacciones from "../pages/transacciones";
+import HabitacionContainer from "../pages/habitaciones/HabitacionContainer";
 
 const Signin = React.lazy(() => import("../pages/signin"));
 const Signup = React.lazy(() => import("../pages/signup"));
 const Projects = React.lazy(() => import("../pages/projects"));
 const Members = React.lazy(() => import("../pages/members"));
 const Logout = React.lazy(() => import("../pages/logout"));
+const RoomDetails = React.lazy(() => import("../pages/room_details"));
 const ProjectDetails = React.lazy(() => import("../pages/project_details"));
 const NewTask = React.lazy(() => import("../pages/tasks/NewTask"));
 const TaskDetailsContainer = React.lazy(
@@ -87,7 +89,33 @@ const router = createBrowserRouter([
       },
       {
         path: "habitaciones",
-        element: <Habitacion />,
+        element: <HabitacionContainer />,
+        children: [
+          { index: true, element: <Habitacion /> },
+          {
+            path: ":roomID",
+            element: <RoomDetails />,
+            children: [
+              { index: true, element: <></> },
+              {
+                path: "tasks",
+                children: [
+                  { index: true, element: <Navigate to="../" /> },
+                  {
+                    path: "new",
+                    element: <NewTask />,
+                  },
+                  {
+                    path: ":taskID",
+                    children: [
+                      { index: true, element: <TaskDetailsContainer /> },
+                    ],
+                  },
+                ],
+              },
+            ],
+          },
+        ],
       },
       {
         path: "huespedes",

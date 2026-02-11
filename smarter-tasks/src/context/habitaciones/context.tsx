@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useReducer } from "react";
 import {
-  HabitacionesActions,
+  RoomsActions,
   HabitacionesState,
   initialState,
   reducer,
@@ -13,7 +13,7 @@ const HabitacionesStateContext = createContext<HabitacionesState | undefined>(
 
 // Lets define a new type called HabitacionesDispatch using TypeScript.
 
-type HabitacionesDispatch = React.Dispatch<HabitacionesActions>;
+type HabitacionesDispatch = React.Dispatch<RoomsActions>;
 
 // Using createContext function, we will create a context
 // called `HabitacionesDispatchContext`. Let's say the shape of this new

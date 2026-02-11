@@ -3,15 +3,15 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 
-// First I'll import the addProject function
-import { addProject } from "../../context/projects/actions";
+// First I'll import the addRoom function
+import { addRoom } from "../../context/habitaciones/actions";
 
-// Then I'll import the useProjectsDispatch hook from projects context
-import { useProjectsDispatch } from "../../context/projects/context";
+// Then I'll import the useHabitacionesDispatch hook from habitaciones context
+import { useHabitacionesDispatch } from "../../context/habitaciones/context";
 type Inputs = {
-  name: string;
+  numero: string;
   tipo: string;
-  precio: number;
+  precio_base: number;
   estado: string;
   notas: string;
 };
@@ -21,9 +21,9 @@ const NewHabitacion = () => {
   // Next, I'll add a new state to handle errors.
   const [error, setError] = useState(null);
 
-  // Then I'll call the useProjectsDispatch function to get the dispatch function
+  // Then I'll call the useHabitacionesDispatch function to get the dispatch function
   // for projects
-  const dispatchProjects = useProjectsDispatch();
+  const dispatchProjects = useHabitacionesDispatch();
   const {
     register,
     handleSubmit,
@@ -36,12 +36,12 @@ const NewHabitacion = () => {
     setIsOpen(true);
   };
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const { name } = data;
+    console.log('newHabitacion data:', data);
 
-    // Next, I'll call the addProject function with two arguments:
+    // Next, I'll call the addRoom function with two arguments:
     //`dispatchProjects` and an object with `name` attribute.
     // As it's an async function, we will await for the response.
-    const response = await addProject(dispatchProjects, { name });
+    const response = await addRoom(dispatchProjects, data);
 
     // Then depending on response, I'll either close the modal...
     if (response.ok) {
@@ -98,14 +98,13 @@ const NewHabitacion = () => {
                       {error && <span>{error}</span>}
                       <input
                         type="text"
-                        placeholder="Nombre de la habitación"
+                        placeholder="Número de la habitación"
                         autoFocus
-                        {...register("name", { required: true })}
-                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${
-                          errors.name ? "border-red-500" : ""
-                        }`}
+                        {...register("numero", { required: true })}
+                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${errors.name ? "border-red-500" : ""
+                          }`}
                       />
-                      {errors.name && <span>Nombre de la habitación es requerido</span>}
+                      {errors.numero && <span>Número de la habitación es requerido</span>}
                       <select
                         {...register("tipo", { required: true })}
                         className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 ${errors.tipo ? "border-red-500" : ""
@@ -116,15 +115,14 @@ const NewHabitacion = () => {
                       </select>
                       {errors.tipo && <span>Tipo de habitación es requerido</span>}
                       <input
-                        type="number"
+                        type="number" step="0.01"
                         placeholder="Precio de habitación"
                         autoFocus
-                        {...register("precio", { required: true })}
-                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${
-                          errors.precio ? "border-red-500" : ""
-                        }`}
+                        {...register("precio_base", { required: true })}
+                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${errors.precio_base ? "border-red-500" : ""
+                          }`}
                       />
-                      {errors.precio && <span>Precio de habitación es requerido</span>}
+                      {errors.precio_base && <span>Precio de habitación es requerido</span>}
                       <select
                         {...register("estado", { required: true })}
                         className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 ${errors.tipo ? "border-red-500" : ""
@@ -146,9 +144,8 @@ const NewHabitacion = () => {
                             message: "Máximo 500 caracteres",
                           },
                         })}
-                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${
-                          errors.notas ? "border-red-500" : ""
-                        }`}
+                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${errors.notas ? "border-red-500" : ""
+                          }`}
                       />
                       {errors.notas && <span>This field is required</span>}
                       <button
