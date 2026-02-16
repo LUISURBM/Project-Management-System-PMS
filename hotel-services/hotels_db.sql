@@ -68,3 +68,13 @@ INSERT INTO habitaciones (numero, tipo, precio_base, id_estado) VALUES
 ('101', 'Simple', 50.00, 1),
 ('102', 'Doble', 80.00, 1),
 ('201', 'Suite', 150.00, 1);
+
+INSERT INTO huespedes (nombre_completo, documento_identidad, telefono, email) VALUES 
+('Juan Pérez', '12345678', '+34912345678', 'juan@example.com');
+
+INSERT INTO reservas (id_huesped, id_habitacion, fecha_entrada, fecha_salida, total_pagado, estado_reserva) VALUES 
+(1, 4, '2023-04-01', '2023-04-05', 200.00, 'Finalizada'),
+(1, 4, '2023-04-10', '2023-04-15', 250.00, 'Finalizada'),
+(1, 4, '2023-05-01', '2023-05-07', 300.00, 'Activa'),
+(1, 4, '2023-05-20', '2023-05-25', 200.00, 'Activa'),
+(1, 4, '2023-06-01', '2023-06-10', 450.00, 'Cancelada');
