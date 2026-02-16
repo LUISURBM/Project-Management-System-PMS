@@ -1,8 +1,8 @@
 import React from "react";
 import { DragDropContext, OnDragEndResponder } from "react-beautiful-dnd";
 import { useParams } from "react-router-dom";
-import { reorderTasks, updateTask } from "../../context/reservas/actions";
-import { useTasksDispatch } from "../../context/reservas/context";
+import { reorderReservas, updateReserva } from "../../context/reservas/actions";
+import { useReservasDispatch } from "../../context/reservas/context";
 import { AvailableColumns, ReservaData } from "../../context/reservas/types";
 import Column from "./Column";
 const Container = (props: React.PropsWithChildren) => {
@@ -10,7 +10,7 @@ const Container = (props: React.PropsWithChildren) => {
 };
 
 const DragDropList = (props: { data: ReservaData }) => {
-  const taskDispatch = useTasksDispatch();
+  const taskDispatch = useReservasDispatch();
   const { roomID } = useParams();
   const onDragEnd: OnDragEndResponder = (result) => {
     const { destination, source, draggableId } = result;
@@ -30,12 +30,12 @@ const DragDropList = (props: { data: ReservaData }) => {
     const finish = props.data.columns[finishKey];
 
     if (start === finish) {
-      const newTaskIDs = Array.from(start.taskIDs);
-      newTaskIDs.splice(source.index, 1);
-      newTaskIDs.splice(destination.index, 0, draggableId);
+      const newReservaIDs = Array.from(start.taskIDs);
+      newReservaIDs.splice(source.index, 1);
+      newReservaIDs.splice(destination.index, 0, draggableId);
       const newColumn = {
         ...start,
-        taskIDs: newTaskIDs,
+        taskIDs: newReservaIDs,
       };
       const newState = {
         ...props.data,
@@ -44,27 +44,27 @@ const DragDropList = (props: { data: ReservaData }) => {
           [newColumn.id]: newColumn,
         },
       };
-      reorderTasks(taskDispatch, newState);
+      reorderReservas(taskDispatch, newState);
       return;
     }
     // start and finish list are different
 
-    const startTaskIDs = Array.from(start.taskIDs);
-    // Remove the item from `startTaskIDs`
-    const updatedItems = startTaskIDs.splice(source.index, 1);
+    const startReservaIDs = Array.from(start.taskIDs);
+    // Remove the item from `startReservaIDs`
+    const updatedItems = startReservaIDs.splice(source.index, 1);
 
     const newStart = {
       ...start,
-      taskIDs: startTaskIDs,
+      taskIDs: startReservaIDs,
     };
 
-    const finishTaskIDs = Array.from(finish.taskIDs);
+    const finishReservaIDs = Array.from(finish.taskIDs);
 
     // Insert the item to destination list.
-    finishTaskIDs.splice(destination.index, 0, draggableId);
+    finishReservaIDs.splice(destination.index, 0, draggableId);
     const newFinish = {
       ...finish,
-      taskIDs: finishTaskIDs,
+      taskIDs: finishReservaIDs,
     };
 
     // Create new state with newStart and newFinish
@@ -77,10 +77,10 @@ const DragDropList = (props: { data: ReservaData }) => {
       },
     };
 
-    reorderTasks(taskDispatch, newState);
-    const updatedTask = props.data.tasks[updatedItems[0]];
-    updatedTask.estado_reserva = finishKey;
-    updateTask(taskDispatch, roomID ?? "", updatedTask);
+    reorderReservas(taskDispatch, newState);
+    const updatedReserva = props.data.tasks[updatedItems[0]];
+    updatedReserva.estado_reserva = finishKey;
+    updateReserva(taskDispatch, roomID ?? "", updatedReserva);
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>

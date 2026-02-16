@@ -1,5 +1,5 @@
 import { Reducer } from "react";
-import { TaskActions, TaskListAvailableAction, ReservaListState } from "./types";
+import { ReservaActions, ReservaListAvailableAction, ReservaListState } from "./types";
 // Define the initial state
 import projectData from "./initialData";
 export const initialState: ReservaListState = {
@@ -8,16 +8,16 @@ export const initialState: ReservaListState = {
   isError: false,
   errorMessage: "",
 };
-export const taskReducer: Reducer<ReservaListState, TaskActions> = (
+export const taskReducer: Reducer<ReservaListState, ReservaActions> = (
   state = initialState,
   action
 ) => {
   switch (action.type) {
-    case TaskListAvailableAction.FETCH_TASKS_REQUEST:
+    case ReservaListAvailableAction.FETCH_BOOKINGS_REQUEST:
       return { ...state, isLoading: true };
-    case TaskListAvailableAction.FETCH_TASKS_SUCCESS:
+    case ReservaListAvailableAction.FETCH_BOOKINGS_SUCCESS:
       return { ...state, isLoading: false, projectData: action.payload };
-    case TaskListAvailableAction.FETCH_TASKS_FAILURE:
+    case ReservaListAvailableAction.FETCH_BOOKINGS_FAILURE:
       return {
         ...state,
         isLoading: false,
@@ -25,22 +25,22 @@ export const taskReducer: Reducer<ReservaListState, TaskActions> = (
         errorMessage: action.payload,
       };
 
-    case TaskListAvailableAction.DELETE_TASKS_REQUEST:
+    case ReservaListAvailableAction.DELETE_BOOKINGS_REQUEST:
       return { ...state, isLoading: true };
-    case TaskListAvailableAction.DELETE_TASKS_SUCCESS:
+    case ReservaListAvailableAction.DELETE_BOOKINGS_SUCCESS:
       return { ...state, isLoading: false };
-    case TaskListAvailableAction.DELETE_TASKS_FAILURE:
+    case ReservaListAvailableAction.DELETE_BOOKINGS_FAILURE:
       return {
         ...state,
         isLoading: false,
         isError: true,
         errorMessage: action.payload,
       };
-    case TaskListAvailableAction.CREATE_TASK_REQUEST:
+    case ReservaListAvailableAction.CREATE_BOOKING_REQUEST:
       return { ...state, isLoading: true };
-    case TaskListAvailableAction.CREATE_TASK_SUCCESS:
+    case ReservaListAvailableAction.CREATE_BOOKING_SUCCESS:
       return { ...state, isLoading: false };
-    case TaskListAvailableAction.CREATE_TASK_FAILURE:
+    case ReservaListAvailableAction.CREATE_BOOKING_FAILURE:
       return {
         ...state,
         isLoading: false,
@@ -48,18 +48,18 @@ export const taskReducer: Reducer<ReservaListState, TaskActions> = (
         errorMessage: action.payload,
       };
     // Toggle the loading state based on action
-    case TaskListAvailableAction.UPDATE_TASK_REQUEST:
+    case ReservaListAvailableAction.UPDATE_BOOKING_REQUEST:
       return { ...state, isLoading: true };
-    case TaskListAvailableAction.UPDATE_TASK_SUCCESS:
+    case ReservaListAvailableAction.UPDATE_BOOKING_SUCCESS:
       return { ...state, isLoading: false };
-    case TaskListAvailableAction.UPDATE_TASK_FAILURE:
+    case ReservaListAvailableAction.UPDATE_BOOKING_FAILURE:
       return {
         ...state,
         isLoading: false,
         isError: true,
         errorMessage: action.payload,
       };
-    case TaskListAvailableAction.REORDER_TASKS:
+    case ReservaListAvailableAction.REORDER_BOOKINGS:
       return { ...state, isLoading: false, projectData: action.payload };
     default:
       return state;

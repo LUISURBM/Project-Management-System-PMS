@@ -13,6 +13,7 @@ import Reservas from "../pages/reservas";
 import Caja from "../pages/caja";
 import Transacciones from "../pages/transacciones";
 import HabitacionContainer from "../pages/habitaciones/HabitacionContainer";
+import NewReserva from "../pages/reservas/NewReserva";
 
 const Signin = React.lazy(() => import("../pages/signin"));
 const Signup = React.lazy(() => import("../pages/signup"));
@@ -98,13 +99,13 @@ const router = createBrowserRouter([
             children: [
               { index: true, element: <></> },
               {
-                path: "tasks",
+                path: "reservas",
                 children: [
                   { index: true, element: <Navigate to="../" /> },
-                  {
-                    path: "new",
-                    element: <NewTask />,
-                  },
+                  // {
+                  //   path: "new",
+                  //   element: <NewReserva />,
+                  // },
                   {
                     path: ":taskID",
                     children: [

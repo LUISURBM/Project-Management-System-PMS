@@ -1,9 +1,9 @@
-interface Habitacion {
+export interface Habitacion {
   id_habitacion: number;
   numero: string;
   precio_base: string;
   id_estado: string;
-  notas: string;
+  notas_extras: string;
   tipo: string;
 }
 

@@ -1,19 +1,20 @@
 import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 
-import { useTasksDispatch, useTasksState } from "../../context/reservas/context";
+import { useReservasDispatch, useReservasState } from "../../context/reservas/context";
 
 import { useHabitacionesState } from "../../context/habitaciones/context";
-import { refreshTasks } from "../../context/reservas/actions";
+import { refreshReservas } from "../../context/reservas/actions";
 import DragDropList from "./DragDropList";
+import NewReserva from "../reservas/NewReserva";
 
 const RoomDetails = () => {
-  const tasksState = useTasksState();
-  const taskDispatch = useTasksDispatch();
+  const tasksState = useReservasState();
+  const taskDispatch = useReservasDispatch();
   const habitacionState = useHabitacionesState();
   let { roomID } = useParams();
   useEffect(() => {
-    if (roomID) refreshTasks(taskDispatch, roomID);
+    if (roomID) refreshReservas(taskDispatch, roomID);
   }, [roomID, taskDispatch]);
   console.log('habitacionState', habitacionState);
   const selectedProject = habitacionState?.payload.items.filter(
@@ -27,37 +28,54 @@ const RoomDetails = () => {
   if (tasksState.isLoading) {
     return <>Loading...</>;
   }
+  const getStatusConfig = (id: string) => {
+    switch (+id) {
+      case 1:
+        return { label: 'Libre', color: '#10b981', shape: '✅' };
+      case 2:
+        return { label: 'Ocupada', color: '#3b82f6', shape: '👤' };
+      case 3:
+        return { label: 'Limpieza', color: '#f59e0b', shape: '🧼' };
+      case 4:
+        return { label: 'Mantenimiento', color: '#ef4444', shape: '🛠️' };
+      default:
+        return { label: 'Desconocido', color: '#9ca3af', shape: '❓' };
+    }
+  };
+
+  // Inside your Component:
+  const status = getStatusConfig(selectedProject.id_estado);
+
   return (
     <>
-      <div className="flex justify-between">
+      <div className="p-2 flex justify-start items-center gap-4">
         <h2 className="text-2xl font-medium tracking-tight text-slate-700">
-          {selectedProject.numero}
+          Habitación {selectedProject.numero}
         </h2>
-        <p>{selectedProject.tipo}</p>
-        <p>{selectedProject.precio_base}COP$</p>
-        <p>{selectedProject.id_estado}</p>
+        <div className="status-container">
+          <span style={{ color: status.color, fontWeight: 'bold' }}>
+            {status.shape}{status.label}
+          </span>
+        </div>
       </div>
-      <div className="pt-4 grid grid-cols-1 gap-2">
+      <div className="p-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
+        Tipo: <p>{selectedProject.tipo}</p>
+        Precio base: <p>{selectedProject.precio_base}COP$</p>
+      </div>
+      <div className="p-4 grid grid-cols-1 gap-2">
         Notas:
-        <p>{selectedProject.notas}</p>
+        <p>{selectedProject.notas_extras}</p>
       </div>
-      <div className="flex justify-end">
+      <div className="flex justify-end flex-wrap gap-2 p-4">
         <Link to={`tasks/new`}>
           <button
             id="newTaskBtn"
-            className="rounded-md bg-blue-600 px-4 py-2 m-2 text-sm font-medium text-white hover:bg-opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
           >
-            Editar
+            ✏️ Editar
           </button>
         </Link>
-        <Link to={`tasks/new`}>
-          <button
-            id="newTaskBtn"
-            className="rounded-md bg-blue-600 px-4 py-2 m-2 text-sm font-medium text-white hover:bg-opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75"
-          >
-            Nueva Reserva
-          </button>
-        </Link>
+        <NewReserva ></NewReserva>
       </div>
       <div className="grid grid-cols-1 gap-2">
         <DragDropList data={tasksState.projectData} />

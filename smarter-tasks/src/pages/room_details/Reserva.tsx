@@ -1,16 +1,16 @@
 import React, { forwardRef } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { Link, useParams } from "react-router-dom";
-import { deleteTask } from "../../context/reservas/actions";
-import { useTasksDispatch } from "../../context/reservas/context";
-import "./TransactionCard.css";
+import { deleteReserva } from "../../context/reservas/actions";
+import { useReservasDispatch } from "../../context/reservas/context";
+import "./ReservaCard.css";
 import { ReservaDetails } from "../../context/reservas/types";
 
 const Reserva = forwardRef<
   HTMLDivElement,
   React.PropsWithChildren<{ task: ReservaDetails }>
 >((props, ref) => {
-  const taskDispatch = useTasksDispatch();
+  const taskDispatch = useReservasDispatch();
   const { roomID } = useParams();
   const { task } = props;
   return (
@@ -40,7 +40,7 @@ const Reserva = forwardRef<
             className="deleteTaskButton cursor-pointer h-4 w-4 rounded-full my-5 mr-5"
             onClick={(event) => {
               event.preventDefault();
-              deleteTask(taskDispatch, roomID ?? "", task);
+              deleteReserva(taskDispatch, roomID ?? "", task);
             }}
           >
             <svg

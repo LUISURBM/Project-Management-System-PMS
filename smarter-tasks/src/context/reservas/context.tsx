@@ -1,22 +1,22 @@
 import React, { createContext, useContext, useReducer } from "react";
 import { initialState, taskReducer } from "./reducer";
-import { ReservaListState, TasksDispatch } from "./types";
-const TasksStateContext = createContext<ReservaListState>(initialState);
-const TasksDispatchContext = createContext<TasksDispatch>(() => {});
-export const TasksProvider: React.FC<React.PropsWithChildren> = ({
+import { ReservaListState, ReservasDispatch } from "./types";
+const ReservasStateContext = createContext<ReservaListState>(initialState);
+const ReservasDispatchContext = createContext<ReservasDispatch>(() => {});
+export const ReservasProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
   // Create a state and dispatch with `useReducer` passing in the `taskReducer` and an initial state. Pass these as values to our contexts.
   const [state, dispatch] = useReducer(taskReducer, initialState);
   return (
-    <TasksStateContext.Provider value={state}>
-      <TasksDispatchContext.Provider value={dispatch}>
+    <ReservasStateContext.Provider value={state}>
+      <ReservasDispatchContext.Provider value={dispatch}>
         {children}
-      </TasksDispatchContext.Provider>
-    </TasksStateContext.Provider>
+      </ReservasDispatchContext.Provider>
+    </ReservasStateContext.Provider>
   );
 };
 
 // Create helper hooks to extract the `state` and `dispacth` out of the context.
-export const useTasksState = () => useContext(TasksStateContext);
-export const useTasksDispatch = () => useContext(TasksDispatchContext);
+export const useReservasState = () => useContext(ReservasStateContext);
+export const useReservasDispatch = () => useContext(ReservasDispatchContext);

@@ -3,62 +3,62 @@ import { API_ENDPOINT } from "../../config/constants";
 import {
   ReservaData,
   ReservaDetails,
-  TaskDetailsPayload,
-  TaskListAvailableAction,
-  TasksDispatch,
+  ReservaDetailsPayload,
+  ReservaListAvailableAction,
+  ReservasDispatch,
 } from "./types";
 
 // The function will take a dispatch as first argument, which can be used to send an action to `reducer` and update the state accordingly
-export const addTask = async (
-  dispatch: TasksDispatch,
-  projectID: string,
-  task: TaskDetailsPayload
+export const addBooking = async (
+  dispatch: ReservasDispatch,
+  booking: ReservaDetailsPayload
 ) => {
   const token = localStorage.getItem("authToken") ?? "";
   try {
-    dispatch({ type: TaskListAvailableAction.CREATE_TASK_REQUEST });
+    dispatch({ type: ReservaListAvailableAction.CREATE_BOOKING_REQUEST });
     const response = await fetch(
-      `${API_ENDPOINT}/projects/${projectID}/tasks/`,
+      `${API_ENDPOINT}/reserva/create/`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(task),
+        body: JSON.stringify(booking),
       }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to create task");
+      throw new Error("Failed to create booking");
     }
-    dispatch({ type: TaskListAvailableAction.CREATE_TASK_SUCCESS });
-    refreshTasks(dispatch, projectID);
+    dispatch({ type: ReservaListAvailableAction.CREATE_BOOKING_SUCCESS });
+    fetchHabitaciones(dispatch);
   } catch (error) {
     console.error("Operation failed:", error);
     dispatch({
-      type: TaskListAvailableAction.CREATE_TASK_FAILURE,
-      payload: "Unable to create task",
+      type: ReservaListAvailableAction.CREATE_BOOKING_FAILURE,
+      payload: "Unable to create booking",
     });
   }
 };
-export const reorderTasks = (
-  dispatch: TasksDispatch,
+export const reorderReservas = (
+  dispatch: ReservasDispatch,
   newState: ReservaData
 ) => {
-  dispatch({ type: TaskListAvailableAction.REORDER_TASKS, payload: newState });
+  dispatch({ type: ReservaListAvailableAction.REORDER_BOOKINGS, payload: newState });
 };
 
-export const refreshTasks = async (
-  dispatch: TasksDispatch,
-  projectID: string
+export const refreshReservas = async (
+  dispatch: ReservasDispatch,
+  roomID: string
 ) => {
   const token = localStorage.getItem("authToken") ?? "";
   try {
-    dispatch({ type: TaskListAvailableAction.FETCH_TASKS_REQUEST });
+    dispatch({ type: ReservaListAvailableAction.FETCH_BOOKINGS_REQUEST });
     const response = await fetch(
-      `${API_ENDPOINT}/projects/${projectID}/reservas`,
+      `${API_ENDPOINT}/bookings/${roomID}/rooms`,
       {
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -67,92 +67,129 @@ export const refreshTasks = async (
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch tasks");
+      throw new Error("Failed to fetch bookings");
     }
 
     // extract the response body as JSON data
     const data = await response.json();
     dispatch({
-      type: TaskListAvailableAction.FETCH_TASKS_SUCCESS,
+      type: ReservaListAvailableAction.FETCH_BOOKINGS_SUCCESS,
       payload: data,
     });
     console.dir(data);
   } catch (error) {
     console.error("Operation failed:", error);
     dispatch({
-      type: TaskListAvailableAction.FETCH_TASKS_FAILURE,
-      payload: "Unable to load tasks",
+      type: ReservaListAvailableAction.FETCH_BOOKINGS_FAILURE,
+      payload: "Unable to load rooms",
     });
   }
 };
 
-export const deleteTask = async (
-  dispatch: TasksDispatch,
+export const deleteReserva = async (
+  dispatch: ReservasDispatch,
   projectID: string,
-  task: ReservaDetails
+  booking: ReservaDetails
 ) => {
   const token = localStorage.getItem("authToken") ?? "";
   try {
-    dispatch({ type: TaskListAvailableAction.DELETE_TASKS_REQUEST });
+    dispatch({ type: ReservaListAvailableAction.DELETE_BOOKINGS_REQUEST });
     const response = await fetch(
-      `${API_ENDPOINT}/projects/${projectID}/tasks/${task.id}`,
+      `${API_ENDPOINT}/projects/${projectID}/bookings/${booking.id}`,
       {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(task),
+        body: JSON.stringify(booking),
       }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to delete task");
+      throw new Error("Failed to delete booking");
     }
-    dispatch({ type: TaskListAvailableAction.DELETE_TASKS_SUCCESS });
-    refreshTasks(dispatch, projectID);
+    dispatch({ type: ReservaListAvailableAction.DELETE_BOOKINGS_SUCCESS });
+    refreshReservas(dispatch, projectID);
   } catch (error) {
     console.error("Operation failed:", error);
     dispatch({
-      type: TaskListAvailableAction.DELETE_TASKS_FAILURE,
-      payload: "Unable to delete task",
+      type: ReservaListAvailableAction.DELETE_BOOKINGS_FAILURE,
+      payload: "Unable to delete booking",
     });
   }
 };
 
-export const updateTask = async (
-  dispatch: TasksDispatch,
+export const updateReserva = async (
+  dispatch: ReservasDispatch,
   projectID: string,
-  task: ReservaDetails
+  booking: ReservaDetails
 ) => {
   const token = localStorage.getItem("authToken") ?? "";
   try {
     // Display loading status
-    dispatch({ type: TaskListAvailableAction.UPDATE_TASK_REQUEST });
+    dispatch({ type: ReservaListAvailableAction.UPDATE_BOOKING_REQUEST });
     const response = await fetch(
-      `${API_ENDPOINT}/projects/${projectID}/tasks/${task.id}`,
+      `${API_ENDPOINT}/projects/${projectID}/bookings/${booking.id}`,
       {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(task),
+        body: JSON.stringify(booking),
       }
     );
 
     if (!response.ok) {
-      throw new Error("Failed to update task");
+      throw new Error("Failed to update booking");
     }
-    // Display success and refresh the tasks
-    dispatch({ type: TaskListAvailableAction.UPDATE_TASK_SUCCESS });
-    refreshTasks(dispatch, projectID);
+    // Display success and refresh the bookings
+    dispatch({ type: ReservaListAvailableAction.UPDATE_BOOKING_SUCCESS });
+    refreshReservas(dispatch, projectID);
   } catch (error) {
     console.error("Operation failed:", error);
     // Display error status
     dispatch({
-      type: TaskListAvailableAction.UPDATE_TASK_FAILURE,
-      payload: "Unable to update task",
+      type: ReservaListAvailableAction.UPDATE_BOOKING_FAILURE,
+      payload: "Unable to update booking",
+    });
+  }
+};
+
+export const fetchHabitaciones = async (
+  dispatch: ReservasDispatch
+) => {
+  const token = localStorage.getItem("authToken") ?? "";
+  try {
+    dispatch({ type: ReservaListAvailableAction.FETCH_BOOKINGS_REQUEST });
+    const response = await fetch(
+      `${API_ENDPOINT}/rooms/list`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch bookings");
+    }
+
+    // extract the response body as JSON data
+    const data = await response.json();
+    dispatch({
+      type: ReservaListAvailableAction.FETCH_BOOKINGS_SUCCESS,
+      payload: data,
+    });
+    console.dir(data);
+  } catch (error) {
+    console.error("Operation failed:", error);
+    dispatch({
+      type: ReservaListAvailableAction.FETCH_BOOKINGS_FAILURE,
+      payload: "Unable to load rooms",
     });
   }
 };

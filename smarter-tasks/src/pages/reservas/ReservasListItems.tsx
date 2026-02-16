@@ -1,10 +1,14 @@
 import { Link } from "react-router-dom";
-import { useProjectsState } from "../../context/projects/context";
+import { useReservasState } from "../../context/reservas/context";
 
 export default function ReservasListItems() {
-  let state: any = useProjectsState();
+  let state: any = useReservasState();
   const { projects, isLoading, isError, errorMessage } = state;
   console.log(projects);
+
+  if (!projects) {
+    return <span>Sin información.</span>;
+  }
 
   if (projects.length === 0 && isLoading) {
     return <span>Loading...</span>;

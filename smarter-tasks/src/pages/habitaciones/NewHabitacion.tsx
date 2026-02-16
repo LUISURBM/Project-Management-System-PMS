@@ -13,7 +13,7 @@ type Inputs = {
   tipo: string;
   precio_base: number;
   estado: string;
-  notas: string;
+  notas_extras: string;
 };
 const NewHabitacion = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -101,7 +101,7 @@ const NewHabitacion = () => {
                         placeholder="Número de la habitación"
                         autoFocus
                         {...register("numero", { required: true })}
-                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${errors.name ? "border-red-500" : ""
+                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${errors.numero ? "border-red-500" : ""
                           }`}
                       />
                       {errors.numero && <span>Número de la habitación es requerido</span>}
@@ -138,16 +138,16 @@ const NewHabitacion = () => {
                         rows={4}
                         placeholder="Notas de habitación"
                         autoFocus
-                        {...register("notas", {
+                        {...register("notas_extras", {
                           maxLength: {
                             value: 500,
                             message: "Máximo 500 caracteres",
                           },
                         })}
-                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${errors.notas ? "border-red-500" : ""
+                        className={`w-full border rounded-md py-2 px-3 my-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-500 focus:shadow-outline-blue ${errors.notas_extras ? "border-red-500" : ""
                           }`}
                       />
-                      {errors.notas && <span>This field is required</span>}
+                      {errors.notas_extras && <span>This field is required</span>}
                       <button
                         id="submitNewHabitacionBtn"
                         type="submit"
