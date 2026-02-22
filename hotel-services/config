@@ -1,8 +1,10 @@
 // config
 db_sql      : mysqldb
-//database    : mysql://app_user:strong_password@localhost:3306/hotel_db?pooling=false
-database (env) : DATABASE_CONNECTION
-database.mysql (env) : ${{ DATABASE_CONNECTION }}
+database    : mysql://app_user:strong_password@localhost:3306/hotel_db?pooling=false
+database,mysql    : mysql://app_user:strong_password@localhost:3306/hotel_db?pooling=false
+//database (env) : DATABASE_CONNECTION
+//database.mysql (env) : ${{ DATABASE_CONNECTION }}
 flow        : 1
 flowui      : 1
 flowip      : '*'
+cors : true

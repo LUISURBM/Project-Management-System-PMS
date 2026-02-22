@@ -8,6 +8,8 @@ NEWACTION('Rooms|list', {
         console.log('🔎 habitaciones:', CONF.database);
 		// List all rooms with optional filtering, sorting and pagination
 		let response = await DATA.list('habitaciones').autoquery($.query, 'id_habitacion:Number, numero:String, tipo:String, precio_base:Decimal, id_estado:Number, notas_extras:String', 'id_habitacion_asc', 100).promise($);
+        // console.log('🔎 habitaciones.bookings:', responseBookings);
+
 		$.callback(response);
 	}
 });
