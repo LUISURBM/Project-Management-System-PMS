@@ -2,3 +2,4 @@ node_modules
 
 # Local Netlify folder
 .netlify
+smarter-tasks/dev-dist/sw.js

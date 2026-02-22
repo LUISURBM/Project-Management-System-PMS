@@ -1,5 +1,6 @@
 // Import required type annotations
 import { API_ENDPOINT } from "../../config/constants";
+import initialData from "./initialData";
 import {
   ReservaData,
   ReservaDetails,
@@ -17,7 +18,7 @@ export const addBooking = async (
   try {
     dispatch({ type: ReservaListAvailableAction.CREATE_BOOKING_REQUEST });
     const response = await fetch(
-      `${API_ENDPOINT}/reserva/create/`,
+      `${API_ENDPOINT}/bookings`,
       {
         method: "POST",
         headers: {
@@ -72,11 +73,31 @@ export const refreshReservas = async (
 
     // extract the response body as JSON data
     const data = await response.json();
+    console.dir(data);
+    const formattedData = initialData;
+    const cancelledIds: Array<string> = [];
+    const activeIds: Array<string> = [];
+    const completedIds: Array<string> = [];
+    let tasks = {};
+    data.forEach((booking: any, index: number) => {
+      if (booking.estado_reserva === "Cancelada") {
+        cancelledIds.push(`${booking.id}`);
+      } else if (booking.estado_reserva === "Activa") {
+        activeIds.push(`${booking.id}`);
+      } else if (booking.estado_reserva === "Finalizada") {
+        completedIds.push(`${booking.id}`);
+      }
+      tasks = { ...tasks, [`${booking.id}`]: booking };
+    });
+    formattedData.columns.Cancelado.taskIDs = cancelledIds;
+    formattedData.columns.Activa.taskIDs = activeIds;
+    formattedData.columns.Finalizado.taskIDs = completedIds;
+    formattedData.tasks = tasks;
+    console.log("Formatted Data:", formattedData);
     dispatch({
       type: ReservaListAvailableAction.FETCH_BOOKINGS_SUCCESS,
-      payload: data,
+      payload: formattedData,
     });
-    console.dir(data);
   } catch (error) {
     console.error("Operation failed:", error);
     dispatch({

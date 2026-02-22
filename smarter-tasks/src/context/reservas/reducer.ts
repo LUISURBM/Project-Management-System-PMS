@@ -12,10 +12,12 @@ export const taskReducer: Reducer<ReservaListState, ReservaActions> = (
   state = initialState,
   action
 ) => {
+  console.log("Reducer received action:", action);
   switch (action.type) {
     case ReservaListAvailableAction.FETCH_BOOKINGS_REQUEST:
       return { ...state, isLoading: true };
     case ReservaListAvailableAction.FETCH_BOOKINGS_SUCCESS:
+      console.log("FETCH_BOOKINGS_SUCCESS", action.payload);
       return { ...state, isLoading: false, projectData: action.payload };
     case ReservaListAvailableAction.FETCH_BOOKINGS_FAILURE:
       return {

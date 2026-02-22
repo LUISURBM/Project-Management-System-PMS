@@ -5,7 +5,7 @@ export const fetchMembers = async (dispatch: any) => {
 
   try {
     dispatch({ type: "FETCH_MEMBERS_REQUEST" });
-    const response = await fetch(`${API_ENDPOINT}/users`, {
+    const response = await fetch(`${API_ENDPOINT}/huespedes`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

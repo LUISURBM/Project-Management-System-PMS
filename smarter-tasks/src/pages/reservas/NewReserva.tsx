@@ -11,6 +11,7 @@ import { useHabitacionesState } from "../../context/habitaciones/context";
 import { useReservasDispatch, useReservasState } from "../../context/reservas/context";
 import { ReservaDetailsPayload } from "../../context/reservas/types";
 import { Habitacion } from "../../context/habitaciones/reducer";
+import { API_ENDPOINT } from "../../config/constants";
 
 type Inputs = {
   name: string;
@@ -22,7 +23,7 @@ type Inputs = {
   number: number;
   totalPagado: number;
   estadoReserva: string;
-  notes: string;
+  notas: string;
   id_huesped: string;
   id_habitacion: string;
   fecha_entrada: string;
@@ -49,13 +50,14 @@ const RoomSelect = ({ onSelect, payload, selectedId }: any) => {
   }, [selectedId, payload]);
 
   useEffect(() => {
+    const items = payload?.items ?? [];
     if (term.length < 1) {
-      setRooms([]);
+      // When the input is empty show a short list of available rooms
+      setRooms(items.slice(0, 50));
       return;
     }
 
     const loadRooms = async () => {
-      const items = payload?.items ?? [];
       const filtered = items.filter((r: any) =>
         r.numero.toString().includes(term) ||
         r.tipo.toLowerCase().includes(term.toLowerCase())
@@ -115,6 +117,25 @@ const RoomSelect = ({ onSelect, payload, selectedId }: any) => {
         placeholder="Escribe número o tipo (ej: 101)..."
         value={term}
         onChange={(e) => { setTerm(e.target.value); setOpenSuggestions(true); }}
+        onFocus={() => {
+          setOpenSuggestions(true);
+          // If empty, load a short list from payload
+          if (term.length < 1) {
+            const items = payload?.items ?? [];
+            setRooms(items.slice(0, 50));
+          }
+          setCursor(-1);
+        }}
+        onClick={() => {
+          if (!openSuggestions) {
+            setOpenSuggestions(true);
+            if (term.length < 1) {
+              const items = payload?.items ?? [];
+              setRooms(items.slice(0, 50));
+            }
+            setCursor(-1);
+          }
+        }}
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         autoComplete="off"
@@ -143,38 +164,122 @@ const RoomSelect = ({ onSelect, payload, selectedId }: any) => {
   );
 };
 
-// GuestSelect uses reservas data to autocomplete guest names (id_huesped)
+// GuestSelect queries the backend `/api/huespedes/search` for autocomplete
 const GuestSelect = ({ onSelect, payload, selectedId }: any) => {
   const [term, setTerm] = useState('');
-  const [guests, setGuests] = useState([] as string[]);
+  const [options, setOptions] = useState<Array<{ value: any; label: string }>>([]);
   const [openSuggestions, setOpenSuggestions] = useState(false);
   const [cursor, setCursor] = useState(-1);
+  const [loading, setLoading] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<{ value: any; label: string } | null>(null);
 
+  // Ensure the input shows the selected option label and isn't overwritten
   useEffect(() => {
-    // Build unique guest list from reservas payload.tasks
-    const itemsObj = payload?.tasks ?? {};
-    const items = Object.values(itemsObj) as any[];
-    const unique = Array.from(new Set(items.map((t) => t.id_huesped)));
-    setGuests(unique);
-  }, [payload]);
-
-  useEffect(() => {
-    if (selectedId && guests.length > 0) {
-      const found = guests.find(g => String(g) === String(selectedId));
-      if (found) setTerm(String(found));
-      else setTerm('');
-    } else {
-      setTerm('');
+    if (selectedOption && term !== selectedOption.label) {
+      setTerm(selectedOption.label);
     }
-  }, [selectedId, guests]);
+  }, [selectedOption]);
 
-  const filtered = term.length > 0 ? guests.filter(g => g.toLowerCase().includes(term.toLowerCase())) : [];
+  useEffect(() => {
+    if (!selectedId) {
+      setTerm('');
+      return;
+    }
 
-  const handleSelect = (guest?: string) => {
-    if (guest) {
-      setTerm(guest);
-      onSelect(guest);
+    const items = payload?.items ?? [];
+    const found = items.find((r: any) =>
+      String(r.id_huesped) === String(selectedId) ||
+      String(r.documento_identidad) === String(selectedId) ||
+      ((r.nombre_completo ?? '') + ' ' + (r.documento_identidad ?? '')) === String(selectedId)
+    );
+
+    if (found) {
+      const label = (found.nombre_completo ?? '') + ' ' + (found.documento_identidad ?? '');
+      const opt = { value: found.id_huesped ?? found.documento_identidad ?? found.nombre_completo, label: label.trim() };
+      setSelectedOption(opt);
+      setTerm(opt.label);
+      setOpenSuggestions(false);
+      return;
+    }
+
+    // If not in payload, try to fetch via search endpoint (fallback)
+    let active = true;
+    const tryFetch = async () => {
+      try {
+        const res = await fetch(`${API_ENDPOINT}/huespedes/search?term=${encodeURIComponent(String(selectedId))}`);
+        if (!active) return;
+        if (res.ok) {
+          const data = await res.json();
+          const row = Array.isArray(data) && data.length > 0 ? data[0] : null;
+          if (row) {
+            const label = (row.nombre_completo ?? '') + ' ' + (row.documento_identidad ?? '');
+            const opt = { value: row.id_huesped ?? row.documento_identidad ?? row.nombre_completo, label: label.trim() };
+            setSelectedOption(opt);
+            setTerm(opt.label);
+            setOpenSuggestions(false);
+            return;
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+      if (active) {
+        setSelectedOption(null);
+        setTerm(String(selectedId));
+      }
+    };
+    tryFetch();
+    return () => { active = false; };
+  }, [selectedId, payload]);
+
+  useEffect(() => {
+    const items = payload?.items ?? [];
+    if (!term || term.length < 1) {
+      // show a short list of recent/available guests when input is empty
+      const mapped = (items.slice(0, 50)).map((r: any) => ({
+        value: r.id_huesped ?? r.documento_identidad ?? r.nombre_completo,
+        label: r.nombre_completo! + ' ' + r.documento_identidad!,
+      }));
+      setOptions(mapped);
+      setLoading(false);
+      return;
+    }
+
+    let active = true;
+    setLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`${API_ENDPOINT}/huespedes/search?term=${encodeURIComponent(term)}`);
+        if (!active) return;
+        if (res.ok) {
+          const data = await res.json();
+          // map rows to {value,label}
+          const mapped = (Array.isArray(data) ? data : []).map((r: any) => ({
+            value: r.id_huesped ?? r.documento_identidad ?? r.nombre_completo,
+            label: r.nombre_completo! + ' ' + r.documento_identidad!,
+          }));
+          setOptions(mapped);
+        } else {
+          setOptions([]);
+        }
+      } catch (e) {
+        setOptions([]);
+      } finally {
+        if (active) setLoading(false);
+      }
+    }, 300);
+
+    return () => { active = false; clearTimeout(timer); };
+  }, [term]);
+
+  const handleSelect = (opt?: { value: any; label: string }) => {
+    console.log('Selected guest option:', opt);
+    if (opt) {
+      setSelectedOption(opt);
+      setTerm(opt.label);
+      onSelect(opt.value);
     } else {
+      setSelectedOption(null);
       setTerm('');
       onSelect(null);
     }
@@ -183,37 +288,76 @@ const GuestSelect = ({ onSelect, payload, selectedId }: any) => {
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'ArrowDown') setCursor(prev => (prev < filtered.length - 1 ? prev + 1 : prev));
+    if (e.key === 'ArrowDown') setCursor(prev => (prev < options.length - 1 ? prev + 1 : prev));
     else if (e.key === 'ArrowUp') setCursor(prev => (prev > 0 ? prev - 1 : prev));
-    else if ((e.key === 'Enter' || e.key === 'Tab') && cursor >= 0 && filtered[cursor]) {
+    else if ((e.key === 'Enter' || e.key === 'Tab') && cursor >= 0 && options[cursor]) {
       e.preventDefault();
-      handleSelect(filtered[cursor]);
+      handleSelect(options[cursor]);
     } else if (e.key === 'Escape') setOpenSuggestions(false);
   };
 
   return (
     <div className="relative w-full">
-      <input
-        type="text"
-        value={term}
-        onChange={(e) => { setTerm(e.target.value); setOpenSuggestions(true); setCursor(-1); }}
-        onKeyDown={handleKeyDown}
-        onBlur={() => setTimeout(() => setOpenSuggestions(false), 150)}
-        placeholder="Buscar huésped..."
-        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
-      />
-      {openSuggestions && filtered.length > 0 && (
+      <div className="relative">
+        <input
+          type="text"
+          value={term}
+          onChange={(e) => { setTerm(e.target.value); setOpenSuggestions(true); setCursor(-1); setSelectedOption(null); }}
+          onFocus={() => {
+            setOpenSuggestions(true);
+            if (term.length < 1) {
+              const items = payload?.items ?? [];
+              const mapped = (items.slice(0, 50)).map((r: any) => ({
+                value: r.id_huesped ?? r.documento_identidad ?? r.nombre_completo,
+                label: r.nombre_completo! + ' ' + r.documento_identidad!,
+              }));
+              setOptions(mapped);
+            }
+            setCursor(-1);
+          }}
+          onClick={() => {
+            setOpenSuggestions(true);
+            if (term.length < 1) {
+              const items = payload?.items ?? [];
+              const mapped = (items.slice(0, 50)).map((r: any) => ({
+                value: r.id_huesped ?? r.documento_identidad ?? r.nombre_completo,
+                label: r.nombre_completo! + ' ' + r.documento_identidad!,
+              }));
+              setOptions(mapped);
+            }
+            setCursor(-1);
+          }}
+          onKeyDown={handleKeyDown}
+          onBlur={() => setTimeout(() => setOpenSuggestions(false), 150)}
+          placeholder="Buscar huésped..."
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border pr-10"
+        />
+
+        {term && (
+          <button
+            type="button"
+            aria-label="Limpiar"
+            onClick={() => { setSelectedOption(null); setTerm(''); setOptions([]); setOpenSuggestions(true); onSelect(null); setCursor(-1); }}
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+      {openSuggestions && (loading ? (
+        <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-xl px-4 py-2">Buscando...</div>
+      ) : options.length > 0 && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-xl max-h-60 overflow-y-auto">
-          {filtered.map((g, i) => (
+          {options.map((opt, i) => (
             <div
-              key={g}
-              onMouseDown={() => handleSelect(g)}
+              key={String(opt.value) + i}
+              onMouseDown={() => handleSelect(opt)}
               className={`px-4 py-2 cursor-pointer text-sm ${cursor === i ? 'bg-blue-600 text-white' : 'hover:bg-blue-50 text-gray-700'}`}>
-              {g}
+              {opt.label}
             </div>
           ))}
         </div>
-      )}
+      ))}
     </div>
   );
 };
@@ -226,8 +370,39 @@ const NewReserva = () => {
     register,
     handleSubmit,
     setValue, watch,
+    reset,
+    getValues,
+    trigger,
     formState: { errors },
   } = useForm<Inputs>();
+
+  // Helper to compute totalPagado and number of days based on current form values
+  const computeTotal = () => {
+    try {
+      const values = getValues();
+      const entradaVal = values.fecha_entrada;
+      const salidaVal = values.fecha_salida;
+      const roomId = values.id_habitacion;
+      const items = payload?.items ?? [];
+      const room = items.find((r: any) => String(r.id_habitacion) === String(roomId));
+      const precio = Number(room?.precio_base) || 0;
+
+      let days = 0;
+      if (entradaVal && salidaVal) {
+        const d1 = new Date(entradaVal);
+        const d2 = new Date(salidaVal);
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const diff = (d2.getTime() - d1.getTime()) / msPerDay;
+        days = Math.max(1, Math.ceil(diff));
+      }
+
+      const total = precio * (days || 0);
+      setValue("totalPagado", total, { shouldValidate: true });
+      setValue("number", days, { shouldValidate: true });
+    } catch (e) {
+      console.warn('computeTotal error', e);
+    }
+  };
   const closeModal = () => {
     setIsOpen(false);
   };
@@ -235,9 +410,19 @@ const NewReserva = () => {
     setIsOpen(true);
   };
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const { name } = data;
-    console.log("Submitting new booking:", name);
-    await addBooking(dispatchProjects, data as ReservaDetailsPayload);
+    try {
+      const { name } = data;
+      console.log("Submitting new booking:", name);
+      await addBooking(dispatchProjects, data as ReservaDetailsPayload);
+      // Clear form, close modal and refresh the page to show updates
+      reset();
+      closeModal();
+      // Small delay to let modal close smoothly
+      setTimeout(() => window.location.reload(), 150);
+    } catch (e: any) {
+      console.error('Error creating booking', e);
+      setError(e?.message || String(e));
+    }
   };
   const selectedRoomId = watch("id_habitacion");
   console.log('Selected room ID:', selectedRoomId);
@@ -265,57 +450,29 @@ const NewReserva = () => {
       try {
         const fechaEntrada = watch("fecha_entrada");
         const fechaSalida = watch("fecha_salida");
-        let total = Number(room.precio_base) || 0;
+        // Re-validate salida when entrada changes
+        if (typeof trigger === 'function') trigger('fecha_salida');
+        setValue("totalPagado", 0, { shouldValidate: true });
+        setValue("number", 0, { shouldValidate: true });
+
+        const precio = Number(room.precio_base) || 0;
+        let days = 1;
         if (fechaEntrada && fechaSalida) {
           const d1 = new Date(fechaEntrada);
           const d2 = new Date(fechaSalida);
           const msPerDay = 1000 * 60 * 60 * 24;
           const diff = (d2.getTime() - d1.getTime()) / msPerDay;
-          const days = Math.max(1, Math.ceil(diff));
-          total = (Number(room.precio_base) || 0) * days;
-          // optionally set number of days
-          setValue("number", days, { shouldValidate: true });
+          days = Math.max(1, Math.ceil(diff));
         }
+
+        const total = precio * days;
         setValue("totalPagado", total, { shouldValidate: true });
+        setValue("number", days, { shouldValidate: true });
       } catch (e) {
-        console.warn('Error calculating totalPagado', e);
+        console.warn('Error recalculating totalPagado', e);
       }
-    } else {
-      setValue("id_habitacion", '', { shouldValidate: true });
     }
-  };
-
-  // Recalculate totalPagado and number (days) whenever entrada/salida or selected room changes
-  const fechaEntrada = watch("fecha_entrada");
-  const fechaSalida = watch("fecha_salida");
-  useEffect(() => {
-    try {
-      const roomId = selectedRoomId;
-      const items = payload?.items ?? [];
-      const room = items.find((r: any) => String(r.id_habitacion) === String(roomId));
-      if (!room) {
-        setValue("totalPagado", 0, { shouldValidate: true });
-        setValue("number", 0, { shouldValidate: true });
-        return;
-      }
-
-      const precio = Number(room.precio_base) || 0;
-      let days = 1;
-      if (fechaEntrada && fechaSalida) {
-        const d1 = new Date(fechaEntrada);
-        const d2 = new Date(fechaSalida);
-        const msPerDay = 1000 * 60 * 60 * 24;
-        const diff = (d2.getTime() - d1.getTime()) / msPerDay;
-        days = Math.max(1, Math.ceil(diff));
-      }
-
-      const total = precio * days;
-      setValue("totalPagado", total, { shouldValidate: true });
-      setValue("number", days, { shouldValidate: true });
-    } catch (e) {
-      console.warn('Error recalculating totalPagado', e);
-    }
-  }, [fechaEntrada, fechaSalida, selectedRoomId, payload]);
+  }
 
   return (
     <>
@@ -323,7 +480,7 @@ const NewReserva = () => {
         onClick={openModal}
         className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
       >
-        Nueva Reservación
+        ➕ Nueva Reservación
       </button>
 
       <Transition appear show={isOpen} as={Fragment}>
@@ -360,40 +517,47 @@ const NewReserva = () => {
                   </Dialog.Title>
                   <form onSubmit={handleSubmit(onSubmit)} className="mt-4">
 
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Fecha de Entrada
-                      </label>
-                      <input
-                        type="datetime-local"
-                        {...register("fecha_entrada", {
-                          required: "La fecha de entrada es requerida",
-                        })}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
-                      />
-                      {errors.fecha_entrada && (
-                        <span className="text-red-500 text-sm">
-                          {errors.fecha_entrada.message}
-                        </span>
-                      )}
-                    </div>
+                    <div className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Fecha de Entrada
+                        </label>
+                        <input
+                          type="datetime-local"
+                          max={getValues("fecha_salida")}
+                          {...register("fecha_entrada", {
+                            required: "La fecha de entrada es requerida"
+                          })}
+                          onInput={() => computeTotal()}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
+                        />
+                        {errors.fecha_entrada && (
+                          <span className="text-red-500 text-sm">
+                            {errors.fecha_entrada.message}
+                          </span>
+                        )}
+                      </div>
 
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-gray-700">
-                        Fecha de Salida
-                      </label>
-                      <input
-                        type="datetime-local"
-                        {...register("fecha_salida", {
-                          required: "La fecha de salida es requerida",
-                        })}
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
-                      />
-                      {errors.fecha_salida && (
-                        <span className="text-red-500 text-sm">
-                          {errors.fecha_salida.message}
-                        </span>
-                      )}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700">
+                          Fecha de Salida
+                        </label>
+                        <input
+                          id="fecha_salida_input"
+                          type="datetime-local"
+                          min={getValues("fecha_entrada")}
+                          {...register("fecha_salida", {
+                            required: "La fecha de salida es requerida"
+                          })}
+                          onInput={() => computeTotal()}
+                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
+                        />
+                        {errors.fecha_salida && (
+                          <span className="text-red-500 text-sm">
+                            {errors.fecha_salida.message}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="mb-4">
@@ -469,7 +633,7 @@ const NewReserva = () => {
                         Notas
                       </label>
                       <textarea
-                        {...register("notes")}
+                        {...register("notas")}
                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
                         rows={3}
                       />

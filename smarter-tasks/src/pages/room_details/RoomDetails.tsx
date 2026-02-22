@@ -25,6 +25,7 @@ const RoomDetails = () => {
     return <>Habitación no existe!</>;
   }
 
+  console.log('tasksState', tasksState);
   if (tasksState.isLoading) {
     return <>Loading...</>;
   }
